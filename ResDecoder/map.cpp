@@ -279,9 +279,10 @@ void MAP::MapHandler(uint8_t * Buffer, uint32_t inSize, uint8_t * outBuffer, uin
 	uint32_t TempNum = 0;						// 临时变量，表示已读取的长度
 	uint16_t TempTimes = 0;					// 临时变量，表示循环的次数
 	uint32_t Temp = 0;
+	bool break_while = false;
 
 	// 当已读取数据的长度小于总长度时继续
-	while (TempNum < inSize && *Buffer++ == 0xFF)
+	while (!break_while && TempNum < inSize && *Buffer++ == 0xFF)
 	{
 		*outBuffer++ = 0xFF;
 		TempNum++;
@@ -389,6 +390,13 @@ void MAP::MapHandler(uint8_t * Buffer, uint32_t inSize, uint8_t * outBuffer, uin
 			// 算法问题，这里不会被执行，但结果一样。
 			*outBuffer++ = 0xD9;
 			TempNum++;
+			break;
+		case 0xE0:
+			break_while = true;  // 如果碰到E0,则说明后面的数据不需要修复
+			while (TempNum < inSize) {
+				*outBuffer++ = *Buffer++;
+				TempNum++;
+			}
 			break;
 		default:
 			break;
